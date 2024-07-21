@@ -1,5 +1,6 @@
-import axios from "axios";
+//import axios from "axios";
 import { useState } from "react";
+import { signUp } from "./api";
 
 export function SignUp() {
   const [username, setUsername] = useState();
@@ -9,18 +10,34 @@ export function SignUp() {
   const [apiProgress, setApiProgress] = useState(false);
   const [successMessage, setSuccessMessage] = useState(false);
 
-  const onSubmit = (event) => {
+  const onSubmit = async (event) => {
     event.preventDefault();
     setSuccessMessage();
     setApiProgress(true);
-    axios.post('/api/v1/users', {
-      username,
-      email,
-      password
-    }).then((response) => {
-      setSuccessMessage(response.data.message)
-    }).finally(() => setApiProgress(false))
-  } 
+    try {
+      const response = await signUp({
+        username,
+        email,
+        password,
+      })
+      setSuccessMessage(response.data.message);
+    } finally {
+      setApiProgress(false);
+    }
+    
+    /*
+    axios
+      .post("/api/v1/users", {
+        username,
+        email,
+        password
+      })
+      .then((response) => {
+        setSuccessMessage(response.data.message);
+      })
+      .finally(() => setApiProgress(false));
+      */
+  };
 
   return (
     <div className="container">
@@ -31,7 +48,9 @@ export function SignUp() {
           </div>
           <div className="card-body">
             <div className="mb-3">
-              <label htmlFor="username" className="form-label">Username</label>
+              <label htmlFor="username" className="form-label">
+                Username
+              </label>
               <input
                 id="username"
                 onChange={(event) => setUsername(event.target.value)}
@@ -39,9 +58,12 @@ export function SignUp() {
               />
             </div>
             <div className="mb-3">
-              <label htmlFor="email" className="form-label">Email</label>
-              <input id="email" 
-                onChange={(event) => setEmail(event.target.value)} 
+              <label htmlFor="email" className="form-label">
+                Email
+              </label>
+              <input
+                id="email"
+                onChange={(event) => setEmail(event.target.value)}
                 className="form-control"
               />
             </div>
@@ -55,7 +77,9 @@ export function SignUp() {
               />
             </div>
             <div className="mb-3">
-              <label htmlFor="passwordRepeat" className="form-label">Password Repeat</label>
+              <label htmlFor="passwordRepeat" className="form-label">
+                Password Repeat
+              </label>
               <input
                 id="passwordRepeat"
                 type="password"
@@ -64,12 +88,25 @@ export function SignUp() {
               />
             </div>
             <div>
-              {successMessage && <div className="alert alert-success" role="alert">
-              {successMessage} </div>}
+              {successMessage && (
+                <div className="alert alert-success" role="alert">
+                  {successMessage}{" "}
+                </div>
+              )}
             </div>
             <div className="text-center">
-              <button className="btn btn-primary" disabled={apiProgress || (!password || password !== passwordRepeat)}>
-                {apiProgress && <span className="spinner-border spinner-border-sm" aria-hidden="true"></span>}
+              <button
+                className="btn btn-primary"
+                disabled={
+                  apiProgress || !password || password !== passwordRepeat
+                }
+              >
+                {apiProgress && (
+                  <span
+                    className="spinner-border spinner-border-sm"
+                    aria-hidden="true"
+                  ></span>
+                )}
                 Sign Up
               </button>
             </div>
