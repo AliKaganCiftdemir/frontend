@@ -1,6 +1,7 @@
 //import axios from "axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { signUp } from "./api";
+import { Input } from "./components/Input";
 
 export function SignUp() {
   const [username, setUsername] = useState();
@@ -9,10 +10,23 @@ export function SignUp() {
   const [passwordRepeat, setPasswordRepeat] = useState();
   const [apiProgress, setApiProgress] = useState(false);
   const [successMessage, setSuccessMessage] = useState(false);
+  const [errors, setErrors] = useState({});
+  const [generalError, setGeneralError] = useState();
+
+
+  useEffect(() => {
+    setErrors(function(lastErrors){
+      return {
+        ...lastErrors,
+        username: undefined
+      }
+    });
+  }, [username])
 
   const onSubmit = async (event) => {
     event.preventDefault();
     setSuccessMessage();
+    setGeneralError();
     setApiProgress(true);
     try {
       const response = await signUp({
@@ -21,7 +35,14 @@ export function SignUp() {
         password,
       })
       setSuccessMessage(response.data.message);
-    } finally {
+    }catch (axiosError) {
+      if (axiosError.response?.data && axiosError.response.data.status === 400) {
+        setErrors(axiosError.response.data.validationErrors);
+      }else {
+        setGeneralError('Unexpected error occured. Please try again.');
+      }
+    }
+     finally {
       setApiProgress(false);
     }
     
@@ -47,17 +68,23 @@ export function SignUp() {
             <h1>Sign Up</h1>
           </div>
           <div className="card-body">
-            <div className="mb-3">
+            <Input id="username" label="Username" error={errors.username} onChange={(event) => setUsername(event.target.value)}/>
+            <Input id="email" label="E-mail" error={errors.email} onChange={(event) => setEmail(event.target.value)}/>
+            
+            {/* <div className="mb-3">
               <label htmlFor="username" className="form-label">
                 Username
               </label>
               <input
                 id="username"
                 onChange={(event) => setUsername(event.target.value)}
-                className="form-control"
+                className={errors.username ? "form-control is-invalid" : "form-control"}
               />
-            </div>
-            <div className="mb-3">
+              <div className="invalid-feedback">
+                {errors.username}
+              </div>
+            </div> */}
+            {/* <div className="mb-3">
               <label htmlFor="email" className="form-label">
                 Email
               </label>
@@ -66,7 +93,7 @@ export function SignUp() {
                 onChange={(event) => setEmail(event.target.value)}
                 className="form-control"
               />
-            </div>
+            </div> */}
             <div className="mb-3">
               <label htmlFor="password">Password</label>
               <input
@@ -87,13 +114,16 @@ export function SignUp() {
                 className="form-control"
               />
             </div>
-            <div>
               {successMessage && (
                 <div className="alert alert-success" role="alert">
-                  {successMessage}{" "}
+                  {successMessage}
                 </div>
               )}
-            </div>
+              {generalError && (
+                <div className="alert alert-danger" role="alert">
+                  {generalError}
+                </div>
+             )}
             <div className="text-center">
               <button
                 className="btn btn-primary"
