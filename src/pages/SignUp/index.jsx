@@ -1,5 +1,7 @@
+/* eslint-disable no-const-assign */
+/* eslint-disable no-unused-vars */
 //import axios from "axios";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { signUp } from "./api";
 import { Input } from "./components/Input";
 
@@ -22,6 +24,24 @@ export function SignUp() {
       }
     });
   }, [username])
+  
+  useEffect(() => {
+    setErrors(function(lastErrors){
+      return {
+        ...lastErrors,
+        email: undefined
+      }
+    });
+  }, [email])
+
+  useEffect(() => {
+    setErrors(function(lastErrors){
+      return {
+        ...lastErrors,
+        password: undefined
+      }
+    });
+  }, [password])
 
   const onSubmit = async (event) => {
     event.preventDefault();
@@ -60,6 +80,19 @@ export function SignUp() {
       */
   };
 
+  /*let passwordRepeatError = '';
+  if (password && password !== passwordRepeat) {
+    passwordRepeatError = 'Password missmatch'
+  }*/
+
+  const passwordRepeatError = useMemo(() => {
+     if (password && password !== passwordRepeat) {
+        passwordRepeatError = 'Password missmatch' 
+      }
+      return '';
+  }, [password, passwordRepeat]);
+
+
   return (
     <div className="container">
       <div className="col-lg-6 offset-lg-3 col-sm-8 offset-sm-2">
@@ -70,7 +103,9 @@ export function SignUp() {
           <div className="card-body">
             <Input id="username" label="Username" error={errors.username} onChange={(event) => setUsername(event.target.value)}/>
             <Input id="email" label="E-mail" error={errors.email} onChange={(event) => setEmail(event.target.value)}/>
-            
+            <Input id="password" label="Password" error={errors.password} onChange={(event) => setPassword(event.target.value)} type="password"/>
+            <Input id="passwordRepeat" label="Password Repeat" error={passwordRepeatError} onChange={(event) => setPasswordRepeat(event.target.value)} type="password"/>
+
             {/* <div className="mb-3">
               <label htmlFor="username" className="form-label">
                 Username
@@ -94,7 +129,7 @@ export function SignUp() {
                 className="form-control"
               />
             </div> */}
-            <div className="mb-3">
+            {/*<div className="mb-3">
               <label htmlFor="password">Password</label>
               <input
                 id="password"
@@ -102,8 +137,8 @@ export function SignUp() {
                 onChange={(event) => setPassword(event.target.value)}
                 className="form-control"
               />
-            </div>
-            <div className="mb-3">
+            </div>*/}
+            {/*<div className="mb-3">
               <label htmlFor="passwordRepeat" className="form-label">
                 Password Repeat
               </label>
@@ -113,7 +148,7 @@ export function SignUp() {
                 onChange={(event) => setPasswordRepeat(event.target.value)}
                 className="form-control"
               />
-            </div>
+            </div>*/}
               {successMessage && (
                 <div className="alert alert-success" role="alert">
                   {successMessage}
