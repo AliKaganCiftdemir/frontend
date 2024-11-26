@@ -87,7 +87,7 @@ export function SignUp() {
 
   const passwordRepeatError = useMemo(() => {
      if (password && password !== passwordRepeat) {
-        passwordRepeatError = 'Password missmatch' 
+        return 'Password missmatch'
       }
       return '';
   }, [password, passwordRepeat]);

@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 export function Input(props) {
   const { id, label, error, onChange, type } = props;
 
